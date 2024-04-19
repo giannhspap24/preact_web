@@ -16,15 +16,19 @@ class RiskMenuViewModel extends GetxController with CacheManager,PatientManager,
   late final LoginService _loginService;
   late final AuthenticationManager _authManager;
   late final PatientManagerObs _patientManager;
-
+  RxString patientIDD="0000".obs;
   @override
   void onInit() {
     super.onInit();
     _loginService = Get.put(LoginService());
     _authManager = Get.find();
     _patientManager=Get.find();
+    setPatientIDD();
   }
 
+  void setPatientIDD(){
+    patientIDD.value=getPatientIDD()!;
+  }
   //Get patientID from PatientManager
   String? getPatientIDD(){
     return getPatientID();
@@ -37,14 +41,21 @@ class RiskMenuViewModel extends GetxController with CacheManager,PatientManager,
 
   //Log out user from risk menu screen
   Future<void> logoutUser() async {
-    print("Trying to logout through riskmenu_view_model");
-    final response = await _loginService.fetchLogout(LogoutRequestModel(authtoken: getToken()));
-    if (response != null) {
-      print(response.token);
-      _authManager.logOut();
-      print("Logged out user through riskmenu_view_model: logout received");
-    } else {
-      print("Logout user through riskmenu_view_model: null response received");
+    print("Trying to logout through search_patient_view_model");
+    try {
+      final response = await _loginService.fetchLogout(
+          LogoutRequestModel(authtoken: getToken()));
+      if (response != null) {
+        print(response.token);
+        _authManager.logOut();
+        print(
+            "Logged out user through search_patient_view_model: logout received");
+      } else {
+        print(
+            "Logout user through search_patient_view_model: null response received");
+      }
+    }catch(e){
+      print("Server is down");
     }
   }
   //Get risk prediction from server for specific patientID
@@ -59,8 +70,10 @@ class RiskMenuViewModel extends GetxController with CacheManager,PatientManager,
         print("User should be logged out from Riskmenu_view_model");
         _authManager.logOut();
       } else {
+        patientIDD.value=patientID;
         _patientManager.setPatientID(patientID);
         _patientManager.setPatientName(jsonString);
+        //savePredictionClass1(jsonString);
         print("Received risk prediction successfully");
       }
     }else{

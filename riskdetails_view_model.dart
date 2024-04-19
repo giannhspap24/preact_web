@@ -17,19 +17,21 @@ import 'login/model/risreport_request_model.dart';
 class RiskDetailsViewModel extends GetxController with CacheManager,PatientManager,PredictionManager{
   late final LoginService _loginService;
   late final AuthenticationManager _authManager;
-  //late final PatientManager _patientManager;
-  var riskprediction="".obs; //make this observable
+
+   RxString patientrisk="0000".obs;
+   RxString patientIDD="0000".obs;
 
   @override
   void onInit() {
     super.onInit();
     _loginService = Get.put(LoginService());
     _authManager = Get.find();
+    getRiskPrediction(getPatientIDD()!);
     //_patientManager=Get.find();
     //RiskDetailsView=widget.RiskDetailsView;
     //WidgetsBinding.instance.addPostFrameCallback((timeStamp) { asyncGetRiskPrediction("1616"); });
   }
-
+  //Get prediction using async task on init
   asyncGetRiskPrediction(String patientID) async {
     final response = await _loginService
         .fetchsearchRequest(RisRequestModel(patientID: patientID,token: getToken(),requesttype: 'ris_request'));
@@ -51,14 +53,21 @@ class RiskDetailsViewModel extends GetxController with CacheManager,PatientManag
   }
   //Log out user from riskdetails screen
   Future<void> logoutUser() async {
-    print("Trying to logout through riskdetails_view_model");
-    final response = await _loginService.fetchLogout(LogoutRequestModel(authtoken: getToken()));
-    if (response != null) {
-      print(response.token);
-      _authManager.logOut();
-      print("Logged out user through riskdetails_view_model: logout received");
-    } else {
-      print("Logout user through riskdetails_view_model: null response received");
+    print("Trying to logout through search_patient_view_model");
+    try {
+      final response = await _loginService.fetchLogout(
+          LogoutRequestModel(authtoken: getToken()));
+      if (response != null) {
+        print(response.token);
+        _authManager.logOut();
+        print(
+            "Logged out user through search_patient_view_model: logout received");
+      } else {
+        print(
+            "Logout user through search_patient_view_model: null response received");
+      }
+    }catch(e){
+      print("Server is down");
     }
   }
 
@@ -77,49 +86,28 @@ class RiskDetailsViewModel extends GetxController with CacheManager,PatientManag
         _authManager.logOut();
       }else{
         savePredictionClass(jsonString);
+        patientrisk.value=jsonString!;
+        patientIDD.value=patientID;
         print("Prediction saved in PredictionManager");
       }
     } else {
       savePredictionClass("Risk prediction is not available");
     }
-    // if (response != null) {
-    //
-    //   print("is not null");
-    //   riskprediction=response.getRisResponseModel();
-    //   print(riskprediction);
-    //   savePredictionClass(riskprediction);
-    // } else { //did not receive answer so token expired
-    //   savePredictionClass("Risk prediction is not available");
-    // }
-
   }
 
   Future<void> getRiskReport(String patientID) async {
-    final response = await _loginService
-        .fetchriskreportRequest(RisRequestModel(patientID: patientID,token: getToken(),requesttype: 'risreport_request'));
+    // final response = await _loginService
+    //     .fetchriskreportRequest(RisRequestModel(patientID: patientID,token: getToken(),requesttype: 'risreport_request'));
+    _loginService.fetchURL(patientID);
 
-    // if (response != null) {
-    //
-    //   //_authManager.login(response.token);
-    //   print("is not null");
-    //
-    //   //riskprediction=response.getRisResponseModel();
-    //   //print(riskprediction);
-    //   //savePredictionClass(riskprediction);
-    //   //riskprediction=getRisResponseModel();
-    //   //print(response.token);
-    // } else { //did not receive answer so token expired
-    //   savePredictionClass("Risk prediction is not available");
-   // }
   }
 
-  String? getPrediction(){ //from PredictionManager
-    print(riskprediction);
-    return getPredictionClass();
+  String? getPrediction(){ //from PatientManager
+    //print(riskprediction);
+    return getPredictionClass1();
   }
   String? getPatientIDD(){ //from PatientManager
     return getPatientID();
-
   }
   String? getPatientName(){
     return getPatientID();

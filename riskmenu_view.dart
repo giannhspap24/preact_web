@@ -1,5 +1,6 @@
 import 'package:auth_manager/core/authentication_manager.dart';
 import 'package:auth_manager/core/patient_manager.dart';
+import 'package:auth_manager/explanations_view.dart';
 import 'package:auth_manager/patientmenu_view_model.dart';
 import 'package:auth_manager/riskdetails_view.dart';
 import 'package:auth_manager/riskmenu_view_model.dart';
@@ -23,12 +24,9 @@ class _RiskMenuViewState extends State<RiskMenuView> {
   AuthenticationManager _authManager = Get.find();
   PatientManagerObs _patientManager =Get.put(PatientManagerObs());
   RiskMenuViewModel _viewModel = Get.put(RiskMenuViewModel());
-  String patientIDD="0000";
   @override
   Widget build(BuildContext context) {
-    if(_viewModel.getPatientIDD() !=null){
-      patientIDD=_viewModel.getPatientIDD()!;
-    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('RiskMainMenu'),
@@ -47,23 +45,25 @@ class _RiskMenuViewState extends State<RiskMenuView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("PatientID:"+patientIDD),
+            Obx(() {
+              return Text("PatientID:"+_viewModel.patientIDD.value);
+            }),
             //Text("PatientID:"+ _patientManager.getPatientID()),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if(_authManager.checkLoginStatus2()){
-                  Get.to(RiskDetailsView());
+                  Get.to(RiskDetailsView()); //
                 }
                 else{
                   Get.off(LoginView());
                 }
               },
-              child: Text('Risk Assesment'),
+              child: Text('Risk Assessment'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if(_authManager.checkLoginStatus2()){
-                  print("Is logged in");
+                  Get.to(ExplanationsView()); //
                 }
                 else{
                   Get.off(LoginView());
@@ -80,7 +80,7 @@ class _RiskMenuViewState extends State<RiskMenuView> {
                   Get.off(LoginView());
                 }
               },
-              child: Text('In time'),
+              child: Text('TempExplanations'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -131,7 +131,7 @@ class _RiskMenuViewState extends State<RiskMenuView> {
                   print("Is logged in");
                 }
                 else{
-                  Get.off(LoginView());
+                  Get.offAll(LoginView());
                 }
               },
               // onPressed: () {

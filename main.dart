@@ -16,7 +16,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'PRE- ACT',
       theme: ThemeData(
-        primarySwatch: Colors.purple,
+        primarySwatch: Colors.indigo,
+          //scaffoldBackgroundColor: const Color(0x00F4FF)
       ),
       home: SplashView(),
     );

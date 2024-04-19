@@ -13,13 +13,13 @@ import 'core/authentication_manager.dart';
 import 'home_view.dart';
 import 'login/login_view.dart';
 
-class armsleeve_webview extends StatefulWidget {
+class radiotherapy_webview extends StatefulWidget {
   //const SearchPatientView({Key? key}) : super(key: key);
   @override
-  _armsleeve_webview createState() => _armsleeve_webview();
+  _radiotherapy_webview createState() => _radiotherapy_webview();
 }
 
-class _armsleeve_webview extends State<armsleeve_webview> {
+class _radiotherapy_webview extends State<radiotherapy_webview> {
   AuthenticationManager _authManager = Get.find();
   PageController pageController = PageController();
   SideMenuController sideMenu = SideMenuController();
@@ -29,7 +29,7 @@ class _armsleeve_webview extends State<armsleeve_webview> {
     return Scaffold(
       backgroundColor: Color(0xFFcde3f8),
       appBar: AppBar(
-        title: Text('About armsleeve'),
+        title: Text('About radiotherapy'),
         flexibleSpace: Container(
           width: 300,
           height: 50,

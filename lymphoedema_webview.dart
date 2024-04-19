@@ -13,13 +13,13 @@ import 'core/authentication_manager.dart';
 import 'home_view.dart';
 import 'login/login_view.dart';
 
-class armsleeve_webview extends StatefulWidget {
+class lymphoedema_webview extends StatefulWidget {
   //const SearchPatientView({Key? key}) : super(key: key);
   @override
-  _armsleeve_webview createState() => _armsleeve_webview();
+  _lymphoedema_webview createState() => _lymphoedema_webview();
 }
 
-class _armsleeve_webview extends State<armsleeve_webview> {
+class _lymphoedema_webview extends State<lymphoedema_webview> {
   AuthenticationManager _authManager = Get.find();
   PageController pageController = PageController();
   SideMenuController sideMenu = SideMenuController();
@@ -29,7 +29,7 @@ class _armsleeve_webview extends State<armsleeve_webview> {
     return Scaffold(
       backgroundColor: Color(0xFFcde3f8),
       appBar: AppBar(
-        title: Text('About armsleeve'),
+        title: Text('About lymphoedema'),
         flexibleSpace: Container(
           width: 300,
           height: 50,
@@ -98,31 +98,6 @@ class _armsleeve_webview extends State<armsleeve_webview> {
             },
             icon: const Icon(Icons.radar_outlined),
           ),
-          // SideMenuExpansionItem(
-          //   title: "Expansion Item",
-          //   icon: const Icon(Icons.kitchen),
-          //   children: [
-          //     SideMenuItem(
-          //       title: 'Expansion Item 1',
-          //       onTap: (index, _) {
-          //         sideMenu.changePage(index);
-          //       },
-          //       icon: const Icon(Icons.home),
-          //       badgeContent: const Text(
-          //         '3',
-          //         style: TextStyle(color: Colors.white),
-          //       ),
-          //       tooltipContent: "Expansion Item 1",
-          //     ),
-          //     SideMenuItem(
-          //       title: 'Expansion Item 2',
-          //       onTap: (index, _) {
-          //         sideMenu.changePage(index);
-          //       },
-          //       icon: const Icon(Icons.supervisor_account),
-          //     )
-          //   ],
-          // ),
           SideMenuItem(
             title: 'About lymphoedema',
             onTap: (index, _) {
@@ -199,7 +174,7 @@ class _armsleeve_webview extends State<armsleeve_webview> {
               color: Colors.white,
               child: const Center(
                 child: Text(
-                  'Settings',
+                  'Placeholder',
                   style: TextStyle(fontSize: 35),
                 ),
               ),

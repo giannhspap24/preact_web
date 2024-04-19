@@ -30,17 +30,22 @@ class PatientMenuViewModel extends GetxController with PatientManager,CacheManag
   }
 
   Future<void> logoutUser() async {
-    print("Trying to logout through patient_view_model");
-    final response = await _loginService.fetchLogout(LogoutRequestModel(authtoken: getToken()));
-
-    if (response != null) {
-      print(response.token);
-      _authManager.logOut();
-      print("Logged out user through patientmenu_view_model: logout received");
-    } else {
-      print("Logout user through patientmenu_view_model: null response received");
+    print("Trying to logout through search_patient_view_model");
+    try {
+      final response = await _loginService.fetchLogout(
+          LogoutRequestModel(authtoken: getToken()));
+      if (response != null) {
+        print(response.token);
+        _authManager.logOut();
+        print(
+            "Logged out user through search_patient_view_model: logout received");
+      } else {
+        print(
+            "Logout user through search_patient_view_model: null response received");
+      }
+    }catch(e){
+      print("Server is down");
     }
-
   }
 
 }
