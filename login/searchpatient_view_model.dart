@@ -25,13 +25,20 @@ class SearchPatientViewModel extends GetxController with CacheManager,PatientMan
   //Log out user from search_patient screen
   Future<void> logoutUser() async {
     print("Trying to logout through search_patient_view_model");
-    final response = await _loginService.fetchLogout(LogoutRequestModel(authtoken: getToken()));
-    if (response != null) {
-      print(response.token);
-      _authManager.logOut();
-      print("Logged out user through search_patient_view_model: logout received");
-    } else {
-      print("Logout user through search_patient_view_model: null response received");
+    try {
+      final response = await _loginService.fetchLogout(
+          LogoutRequestModel(authtoken: getToken()));
+      if (response != null) {
+        print(response.token);
+        _authManager.logOut();
+        print(
+            "Logged out user through search_patient_view_model: logout received");
+      } else {
+        print(
+            "Logout user through search_patient_view_model: null response received");
+      }
+    }catch(e){
+      print("Server is down");
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:auth_manager/core/patient_manager.dart';
 import 'package:auth_manager/login/login_view_model.dart';
 import 'package:auth_manager/login/searchpatient_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../core/authentication_manager.dart';
@@ -22,7 +23,6 @@ class _SearchPatientView extends State<SearchPatientView> {
   final GlobalKey<FormState> formKey = GlobalKey();
   SearchPatientViewModel _viewModel = Get.put(SearchPatientViewModel());
   TextEditingController patientIDctr = TextEditingController();
-  FormType _formType = FormType.searchpatient;
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +39,19 @@ class _SearchPatientView extends State<SearchPatientView> {
         },
         icon: Icon(Icons.logout_rounded),
       )]),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: searchpatientForm(),
+      body: RawKeyboardListener(
+        focusNode: FocusNode(),
+        onKey: (RawKeyEvent event) {
+          if (event.runtimeType == RawKeyDownEvent) {
+            if (event.logicalKey == LogicalKeyboardKey.enter) {
+              _onButtonPressed();
+            }
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: searchpatientForm(),
+        ),
       ),
     );
   }
@@ -63,37 +73,38 @@ class _SearchPatientView extends State<SearchPatientView> {
           height: 8,
         ),
         ElevatedButton(
-          onPressed: () async {
-            if (formKey.currentState?.validate() ?? false) {
-              await _viewModel.searchPatient(patientIDctr.text);
-              //if patient found and you are logged in, move to PatientMenu. Else move to LoginView
-              if(_viewModel.foundPatient()){
-                if(_authManager.checkLoginStatus2()){
-                  Get.to(PatientMenuView());
-                }
-                else{
-                  Get.off(LoginView());
-                }
-              }//if patient not found, check whether user should be prompted to log-in screen or retry with another patientID
-              else{
-                if(_authManager.checkLoginStatus2()){
-                  Get.showSnackbar(
-                    GetSnackBar(
-                      message: 'PatientID not found',
-                      icon: const Icon(Icons.dangerous),
-                      duration: const Duration(seconds: 3),
-                    ),
-                  );
-                }else{
-                  Get.off(LoginView());
-                }
-              }
-            }
-          },
+          onPressed: _onButtonPressed,
           child: Text('Search Patient'),
         ),
       ]),
     );
+  }
+
+  void _onButtonPressed() async {
+    if (formKey.currentState?.validate() ?? false) {
+      await _viewModel.searchPatient(patientIDctr.text);
+      if(_viewModel.foundPatient()){
+        if(_authManager.checkLoginStatus2()){
+          Get.to(PatientMenuView());
+        }
+        else{
+          Get.off(LoginView());
+        }
+      }//if patient not found, check whether user should be prompted to log-in screen or retry with another patientID
+      else{
+        if(_authManager.checkLoginStatus2()){
+          Get.showSnackbar(
+            GetSnackBar(
+              message: 'PatientID not found',
+              icon: const Icon(Icons.dangerous),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }else{
+          Get.offAll(LoginView());
+        }
+      }
+    }
   }
 }
 

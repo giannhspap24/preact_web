@@ -1,10 +1,10 @@
-import 'package:auth_manager/core/patient_manager_obs.dart';
-import 'package:auth_manager/login/login_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../core/authentication_manager.dart';
 import '../home_view.dart';
+import 'login_view_model.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -17,7 +17,6 @@ class _LoginViewState extends State<LoginView> {
   final GlobalKey<FormState> formKey = GlobalKey();
   LoginViewModel _viewModel = Get.put(LoginViewModel());
   AuthenticationManager _authManager = Get.find();
-  //PatientManagerObs _patientManager = Get.find();
   TextEditingController emailCtr = TextEditingController();
   TextEditingController passwordCtr = TextEditingController();
   FormType _formType = FormType.login;
@@ -25,13 +24,40 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: _formType == FormType.login ? Text('Login') : Text('Register'),
+        backgroundColor: Color(0xFFcde3f8),
+        appBar: AppBar(
+          flexibleSpace: Container(
+            width: 300,
+            height: 50,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('images/preactlogo.jpg'), // Replace 'images/preactlogo_new.jpg' with your image path
+                fit: BoxFit.contain, // Adjust the image fit
+              ),
+            ),
+          ),
+          toolbarHeight: 50, // Adjust the toolbar height as per your requirement
+        ),
+      body:
+      Center(
+      child:Container(
+        width: 400, // Set your desired width here
+        child: RawKeyboardListener(
+          focusNode: FocusNode(),
+          onKey: (RawKeyEvent event) {
+            if (event.runtimeType == RawKeyDownEvent) {
+              if (event.logicalKey == LogicalKeyboardKey.enter) {
+                _onButtonPressed();
+              }
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: _formType == FormType.login ? loginForm() : registerForm(),
+          ),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: _formType == FormType.login ? loginForm() : registerForm(),
-      ),
+      )
     );
   }
 
@@ -40,48 +66,66 @@ class _LoginViewState extends State<LoginView> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       key: formKey,
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text(
+          'Welcome',
+          style: TextStyle(
+            fontSize: 28,
+            color: Colors.indigo,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        SizedBox(
+          height: 8,
+          width: 12,
+        ),
         TextFormField(
           controller: emailCtr,
           validator: (value) {
             return (value == null || value.isEmpty)
-                ? 'Please Enter Username'
+                ? '' //Please enter Username
                 : null;
           },
-          decoration: inputDecoration('Username', Icons.person),
+          decoration: inputDecoration('E-mail', Icons.email ),
+
         ),
         SizedBox(
           height: 8,
+          width: 12,
         ),
         TextFormField(
           validator: (value) {
             return (value == null || value.isEmpty)
-                ? 'Please Enter Password'
+                ? ''  //Please enter Password
                 : null;
           },
           controller: passwordCtr,
-          obscureText: true, //show character '*' per letter
+          obscureText: true,
           decoration: inputDecoration('Password', Icons.lock),
         ),
+        SizedBox(
+          height: 10, // Add desired space between TextFormField and ElevatedButton
+        ),
         ElevatedButton(
-          onPressed: () async {
-            if (formKey.currentState?.validate() ?? false) {
-              await _viewModel.loginUser(emailCtr.text, passwordCtr.text);
-              if (_authManager.checkLoginStatus2()) {
-                Get.off(HomeView());
-              }else{
-                Get.showSnackbar(
-                  GetSnackBar(
-                    message: 'Server is not available',
-                    icon: const Icon(Icons.dangerous),
-                    duration: const Duration(seconds: 3),
-                  ),
-                );
-              }
-            }else{
-              print("User is logged out");
-            }
-          },
-          child: Text('Login'),
+          onPressed: _onButtonPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo, // Change button color to blue
+            //onPrimary: Colors.white, // Change text color to white
+          ),
+          child: SizedBox(
+            child: Center(
+              child: Text('Log in',style: TextStyle(color: Colors.white,fontSize: 18), ),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 10, // Add desired space between TextFormField and ElevatedButton
+        ),
+        Text(
+          'Forgot Password?',
+          style: TextStyle(
+              fontSize: 14,
+              color: Colors.indigo,
+          ),
         ),
       ]),
     );
@@ -125,11 +169,7 @@ class _LoginViewState extends State<LoginView> {
           decoration: inputDecoration('Retype Password', Icons.lock),
         ),
         ElevatedButton(
-          onPressed: () async {
-            if (formKey.currentState?.validate() ?? false) {
-              await _viewModel.registerUser(emailCtr.text, passwordCtr.text);
-            }
-          },
+          onPressed: _onButtonPressed,
           child: Text('Register'),
         ),
         TextButton(
@@ -143,8 +183,31 @@ class _LoginViewState extends State<LoginView> {
       ]),
     );
   }
+
+  void _onButtonPressed() async {
+    if (formKey.currentState?.validate() ?? false) {
+      if (_formType == FormType.login) {
+        await _viewModel.loginUser(emailCtr.text, passwordCtr.text);
+      } else {
+        await _viewModel.registerUser(emailCtr.text, passwordCtr.text);
+      }
+      if (_authManager.checkLoginStatus2()) {
+        Get.off(HomeView());
+      } else {
+        Get.showSnackbar(
+          GetSnackBar(
+            message: 'Authentication error: either (username, password) combination is not correct or user is already logged in', //'Server is not available'
+            icon: const Icon(Icons.dangerous),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } else {
+      print("User is logged out");
+    }
+  }
 }
-//https://www.aueb.gr/sites/default/files/Winter-Exams-23-24%2020231205.pdf
+
 InputDecoration inputDecoration(String labelText, IconData iconData,
     {String? prefix, String? helperText}) {
   return InputDecoration(

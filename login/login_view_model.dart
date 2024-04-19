@@ -32,14 +32,14 @@ class LoginViewModel extends GetxController {
       print(response.token);
       print("login response is not null");
     } else {
-      Get.showSnackbar(
-        GetSnackBar(
-          message: 'Server is down or given (username, password) combination is wrong',
-          icon: const Icon(Icons.dangerous),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-
+      // Get.showSnackbar(
+      //   GetSnackBar(
+      //     message: 't', // test
+      //     icon: const Icon(Icons.dangerous),
+      //     duration: const Duration(seconds: 3),
+      //   ),
+      // );
+      print("Login response is null");
     }
   }
 
